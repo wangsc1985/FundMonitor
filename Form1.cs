@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -78,6 +79,8 @@ namespace FundMonitor
             }
 
 
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
             double increase = 0;
             foreach (var p in positions)
             {
@@ -96,6 +99,9 @@ namespace FundMonitor
                 increase += p.increase;
             }
 
+                watch.Stop();
+
+            //label1.Text = watch.ElapsedMilliseconds+"";
             labelFunIncrease.Text = string.Format("{0:N2}", increase / positions.Count * 100);
             if (increase > 0)
             {
@@ -136,13 +142,6 @@ namespace FundMonitor
         private bool move = false;
         private int MouseX, MouseY;
 
-        private void Form1_MouseClick(object sender, MouseEventArgs e)
-        {
-           if(e.Button == MouseButtons.Right)
-            {
-                this.Close();
-            }
-        }
 
         private void labelFunIncrease_MouseDown(object sender, MouseEventArgs e)
         {
@@ -168,6 +167,14 @@ namespace FundMonitor
         {
             this.Cursor = Cursors.Default;
             this.move = false;
+        }
+
+        private void labelFunIncrease_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                this.Close();
+            }
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)

@@ -41,7 +41,7 @@
             this.labelSz.BackColor = System.Drawing.Color.Transparent;
             this.labelSz.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelSz.ForeColor = System.Drawing.Color.White;
-            this.labelSz.Location = new System.Drawing.Point(12, 9);
+            this.labelSz.Location = new System.Drawing.Point(12, 90);
             this.labelSz.Name = "labelSz";
             this.labelSz.Size = new System.Drawing.Size(100, 17);
             this.labelSz.TabIndex = 0;
@@ -54,7 +54,7 @@
             this.labelSzIncrease.BackColor = System.Drawing.Color.Transparent;
             this.labelSzIncrease.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelSzIncrease.ForeColor = System.Drawing.Color.White;
-            this.labelSzIncrease.Location = new System.Drawing.Point(144, 9);
+            this.labelSzIncrease.Location = new System.Drawing.Point(144, 90);
             this.labelSzIncrease.Name = "labelSzIncrease";
             this.labelSzIncrease.Size = new System.Drawing.Size(70, 17);
             this.labelSzIncrease.TabIndex = 0;
@@ -69,19 +69,20 @@
             this.labelFunIncrease.BackColor = System.Drawing.Color.Transparent;
             this.labelFunIncrease.Font = new System.Drawing.Font("方正粗黑宋简体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelFunIncrease.ForeColor = System.Drawing.Color.White;
-            this.labelFunIncrease.Location = new System.Drawing.Point(12, 35);
+            this.labelFunIncrease.Location = new System.Drawing.Point(12, 37);
             this.labelFunIncrease.Name = "labelFunIncrease";
             this.labelFunIncrease.Size = new System.Drawing.Size(202, 42);
             this.labelFunIncrease.TabIndex = 0;
             this.labelFunIncrease.Text = "0";
             this.labelFunIncrease.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelFunIncrease.MouseClick += new System.Windows.Forms.MouseEventHandler(this.labelFunIncrease_MouseClick);
             this.labelFunIncrease.MouseDown += new System.Windows.Forms.MouseEventHandler(this.labelFunIncrease_MouseDown);
             this.labelFunIncrease.MouseMove += new System.Windows.Forms.MouseEventHandler(this.labelFunIncrease_MouseMove);
             this.labelFunIncrease.MouseUp += new System.Windows.Forms.MouseEventHandler(this.labelFunIncrease_MouseUp);
             // 
             // timer1
             // 
-            this.timer1.Interval = 5000;
+            this.timer1.Interval = 2000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // labelTime
@@ -90,7 +91,7 @@
             this.labelTime.BackColor = System.Drawing.Color.Transparent;
             this.labelTime.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelTime.ForeColor = System.Drawing.Color.White;
-            this.labelTime.Location = new System.Drawing.Point(134, 90);
+            this.labelTime.Location = new System.Drawing.Point(134, 9);
             this.labelTime.Name = "labelTime";
             this.labelTime.Size = new System.Drawing.Size(80, 17);
             this.labelTime.TabIndex = 1;
@@ -114,7 +115,6 @@
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseClick);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
