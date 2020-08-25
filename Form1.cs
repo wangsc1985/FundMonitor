@@ -26,11 +26,6 @@ namespace FundMonitor
         {
             InitializeComponent();
 
-            //positions.Add(new Position("002673", "西部证券", 10.158, 4900));
-            //positions.Add(new Position("002839", "张家港行", 6.242, 8000));
-            //positions.Add(new Position("601319", "中国人保", 7.224, 7000));
-            //positions.Add(new Position("601319", "中国人保", 7.108, 7000));
-
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load("positions.xml");
             XmlNodeList nodeList = xmlDoc.SelectSingleNode("positions").ChildNodes;
