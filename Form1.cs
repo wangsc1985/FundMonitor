@@ -100,18 +100,19 @@ namespace FundMonitor
                 p.increase = (price - p.cost) / p.cost;
 
                 DateTime now = DateTime.Now;
-                var tt = result[31].Split(':');
-                var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
+                //var tt = result[31].Split(':');
+                //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
 
                 increase += p.increase;
-                label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
+                //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
+                //label1.Text = now.ToString("HH:mm:ss");
             }
             increase = increase / positions.Count * 100;
             if (Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
             {
                 if (increase < 0)
                 {
-                    speake(string.Format("{0:F2}", increase), -5);
+                    speake("负"+string.Format("{0:F2}", -increase), -5);
                 }
                 else
                 {
