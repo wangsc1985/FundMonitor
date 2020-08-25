@@ -7,6 +7,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,9 @@ namespace FundMonitor
     public partial class Form1 : Form
     {
         private List<Position> positions = new List<Position>();
+        private double preIncrease = 0;
+
+
         public Form1()
         {
             InitializeComponent();
@@ -37,7 +41,7 @@ namespace FundMonitor
                 string name = xe.GetAttribute("name");
                 string cost = xe.GetAttribute("cost");
                 string amount = xe.GetAttribute("amount");
-                positions.Add(new Position(code, name,Double.Parse(cost), int.Parse(amount)));
+                positions.Add(new Position(code, name, Double.Parse(cost), int.Parse(amount)));
             }
         }
 
@@ -60,7 +64,7 @@ namespace FundMonitor
             //double increase = (price - open) / open;
             labelTime.Text = result[31];
             labelSz.Text = string.Format("{0:N2}", open);
-            labelSzIncrease.Text = string.Format("{0:N2}", (price-open)/open*100);
+            labelSzIncrease.Text = string.Format("{0:N2}", (price - open) / open * 100);
 
             if (price > open)
             {
@@ -79,30 +83,47 @@ namespace FundMonitor
             }
 
 
-                Stopwatch watch = new Stopwatch();
-                watch.Start();
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             double increase = 0;
             foreach (var p in positions)
             {
-                 url = "https://hq.sinajs.cn/list=" + p.exchange + p.code;
-                 body = HttpHelper.GetHttp(url);
+                url = "https://hq.sinajs.cn/list=" + p.exchange + p.code;
+                body = HttpHelper.GetHttp(url);
 
                 result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
 
 
                 open = Double.Parse(result[2]);
                 price = Double.Parse(result[3]);
-                //double increase = (price - open) / open;
                 labelTime.Text = result[31];
                 p.increase = (price - p.cost) / p.cost;
 
-                increase += p.increase;
-            }
+                DateTime now = DateTime.Now;
+                var tt = result[31].Split(':');
+                var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
 
-                watch.Stop();
+                increase += p.increase;
+                label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
+            }
+            increase = increase / positions.Count * 100;
+            if (Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
+            {
+                if (increase < 0)
+                {
+                    speake(string.Format("{0:F2}", increase), -5);
+                }
+                else
+                {
+                    speake(string.Format("{0:F2}", increase));
+                }
+                preIncrease = increase;
+            }
+            watch.Stop();
+
 
             //label1.Text = watch.ElapsedMilliseconds+"";
-            labelFunIncrease.Text = string.Format("{0:N2}", increase / positions.Count * 100);
+            labelFunIncrease.Text = string.Format("{0:F2}", increase);
             if (increase > 0)
             {
                 labelFunIncrease.ForeColor = Color.Red;
@@ -185,6 +206,21 @@ namespace FundMonitor
                 this.move = true;
             }
         }
+
+        private void speake(string msg)
+        {
+            SpeechSynthesizer speech = new SpeechSynthesizer();
+            speech.Rate = 0;
+            speech.Volume = 100;
+            speech.SpeakAsync(msg);
+        }
+        private void speake(string msg, int rate)
+        {
+            SpeechSynthesizer speech = new SpeechSynthesizer();
+            speech.Rate = rate;
+            speech.Volume = 100;
+            speech.SpeakAsync(msg);
+        }
     }
     class Position
     {
@@ -203,18 +239,7 @@ namespace FundMonitor
             this.name = name;
             this.cost = cost;
             this.amount = amount;
-            this.exchange = code.Substring(0, 1).Equals("6") ? "sh" : "sz";
+            exchange = code.Substring(0, 1).Equals("6") ? "sh" : "sz";
         }
-    }
-    public class StockInfo
-    {
-        public string time;
-        public string name;
-        public string code;
-        public double cost;
-        public double price;
-        public double increase;
-        public string exchange;
-        public double amount;
     }
 }

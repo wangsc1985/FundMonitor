@@ -34,6 +34,7 @@
             this.labelFunIncrease = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.labelTime = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // labelSz
@@ -41,7 +42,7 @@
             this.labelSz.BackColor = System.Drawing.Color.Transparent;
             this.labelSz.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelSz.ForeColor = System.Drawing.Color.White;
-            this.labelSz.Location = new System.Drawing.Point(12, 90);
+            this.labelSz.Location = new System.Drawing.Point(12, 91);
             this.labelSz.Name = "labelSz";
             this.labelSz.Size = new System.Drawing.Size(100, 17);
             this.labelSz.TabIndex = 0;
@@ -54,7 +55,7 @@
             this.labelSzIncrease.BackColor = System.Drawing.Color.Transparent;
             this.labelSzIncrease.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelSzIncrease.ForeColor = System.Drawing.Color.White;
-            this.labelSzIncrease.Location = new System.Drawing.Point(144, 90);
+            this.labelSzIncrease.Location = new System.Drawing.Point(144, 91);
             this.labelSzIncrease.Name = "labelSzIncrease";
             this.labelSzIncrease.Size = new System.Drawing.Size(70, 17);
             this.labelSzIncrease.TabIndex = 0;
@@ -63,8 +64,7 @@
             // 
             // labelFunIncrease
             // 
-            this.labelFunIncrease.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.labelFunIncrease.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labelFunIncrease.BackColor = System.Drawing.Color.Transparent;
             this.labelFunIncrease.Font = new System.Drawing.Font("方正粗黑宋简体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -82,7 +82,7 @@
             // 
             // timer1
             // 
-            this.timer1.Interval = 2000;
+            this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // labelTime
@@ -98,15 +98,28 @@
             this.labelTime.Text = "00:00:00";
             this.labelTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(60, 17);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "0";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(29)))), ((int)(((byte)(29)))), ((int)(((byte)(29)))));
-            this.ClientSize = new System.Drawing.Size(226, 116);
+            this.ClientSize = new System.Drawing.Size(226, 117);
             this.Controls.Add(this.labelTime);
             this.Controls.Add(this.labelFunIncrease);
             this.Controls.Add(this.labelSzIncrease);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.labelSz);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Form1";
@@ -129,6 +142,7 @@
         private System.Windows.Forms.Label labelFunIncrease;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label labelTime;
+        private System.Windows.Forms.Label label1;
     }
 }
 
