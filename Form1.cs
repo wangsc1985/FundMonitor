@@ -19,15 +19,38 @@ namespace FundMonitor
     public partial class Form1 : Form
     {
         private List<Position> positions = new List<Position>();
-        private double preIncrease = 0;
+        private double preIncrease = 0, preMinIncrease = 10000;
 
 
+        private void setValue(string key, Object value)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load("data.xml");
+            XmlElement root = (XmlElement)xmlDoc.SelectSingleNode("app");//查找<bookstore>
+            if (root == null)
+                return;
+            root.SetAttribute(key, value.ToString());
+            xmlDoc.Save("data.xml");
+        }
+
+        private string getValue(string key)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load("data.xml");
+            XmlElement root = (XmlElement)xmlDoc.SelectSingleNode("app");//查找<bookstore>
+            if (root == null)
+                return null;
+            if (root.HasAttribute(key))
+                return root.GetAttribute(key);
+            else
+                return null;
+        }
         public Form1()
         {
             InitializeComponent();
 
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load("positions.xml");
+            xmlDoc.Load("data.xml");
             //XmlNodeList nodeList = xmlDoc.SelectSingleNode("positions").ChildNodes;
             XmlNodeList nodeList = xmlDoc.SelectNodes("//position");
             foreach (XmlNode xn in nodeList)
@@ -38,6 +61,18 @@ namespace FundMonitor
                 string cost = xe.GetAttribute("cost");
                 string amount = xe.GetAttribute("amount");
                 positions.Add(new Position(code, name, Double.Parse(cost), int.Parse(amount)));
+            }
+
+
+            var left = this.getValue("left");
+            if (left != null)
+            {
+                this.Left = Convert.ToInt32(left);
+            }
+            var top = this.getValue("top");
+            if (top != null)
+            {
+                this.Top = Convert.ToInt32(top);
             }
         }
 
@@ -91,6 +126,7 @@ namespace FundMonitor
             Stopwatch watch = new Stopwatch();
             watch.Start();
             double increase = 0;
+            DateTime now = DateTime.Now;
             try
             {
                 foreach (var p in positions)
@@ -106,7 +142,6 @@ namespace FundMonitor
                     labelTime.Text = result[31];
                     p.increase = (price - p.cost) / p.cost;
 
-                    DateTime now = DateTime.Now;
                     //var tt = result[31].Split(':');
                     //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
 
@@ -144,6 +179,27 @@ namespace FundMonitor
                 {
                     labelFunIncrease.ForeColor = Color.Cyan;
                 }
+
+                if (now.Second == 0)
+                {
+                    if (preMinIncrease != 10000)
+                    {
+                        label1.Text = string.Format("{0:F2}", increase - preMinIncrease);
+                        if (increase > preMinIncrease)
+                        {
+                            label1.ForeColor = Color.Red;
+                        }
+                        else if (increase == preMinIncrease)
+                        {
+                            label1.ForeColor = Color.White;
+                        }
+                        else
+                        {
+                            label1.ForeColor = Color.Cyan;
+                        }
+                    }
+                    preMinIncrease = increase;
+                }
             }
             catch (Exception)
             {
@@ -154,6 +210,9 @@ namespace FundMonitor
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             this.timer1.Stop();
+
+            this.setValue("left", this.Left);
+            this.setValue("top", this.Top);
         }
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
