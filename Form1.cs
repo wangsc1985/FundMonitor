@@ -28,7 +28,8 @@ namespace FundMonitor
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load("positions.xml");
-            XmlNodeList nodeList = xmlDoc.SelectSingleNode("positions").ChildNodes;
+            //XmlNodeList nodeList = xmlDoc.SelectSingleNode("positions").ChildNodes;
+            XmlNodeList nodeList = xmlDoc.SelectNodes("//position");
             foreach (XmlNode xn in nodeList)
             {
                 XmlElement xe = (XmlElement)xn;
@@ -51,86 +52,102 @@ namespace FundMonitor
             string url = "https://hq.sinajs.cn/list=sh000001";
             string body = HttpHelper.GetHttp(url);
 
-            string[] result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
-
-
-            double open = Double.Parse(result[2]);
-            double price = Double.Parse(result[3]);
-            //double increase = (price - open) / open;
-            labelTime.Text = result[31];
-            labelSz.Text = string.Format("{0:N2}", open);
-            labelSzIncrease.Text = string.Format("{0:N2}", (price - open) / open * 100);
-
-            if (price > open)
+            try
             {
-                labelSz.ForeColor = Color.Red;
-                labelSzIncrease.ForeColor = Color.Red;
+                string[] result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
+
+
+                double open = Double.Parse(result[2]);
+                double price = Double.Parse(result[3]);
+                //double increase = (price - open) / open;
+                labelTime.Text = result[31];
+                labelSz.Text = string.Format("{0:N2}", open);
+                labelSzIncrease.Text = string.Format("{0:N2}", (price - open) / open * 100);
+
+                if (price > open)
+                {
+                    labelSz.ForeColor = Color.Red;
+                    labelSzIncrease.ForeColor = Color.Red;
+                }
+                else if (price == open)
+                {
+                    labelSz.ForeColor = Color.White;
+                    labelSzIncrease.ForeColor = Color.White;
+                }
+                else
+                {
+                    labelSz.ForeColor = Color.Cyan;
+                    labelSzIncrease.ForeColor = Color.Cyan;
+                }
             }
-            else if (price == open)
+            catch (Exception)
             {
-                labelSz.ForeColor = Color.White;
-                labelSzIncrease.ForeColor = Color.White;
-            }
-            else
-            {
-                labelSz.ForeColor = Color.Cyan;
-                labelSzIncrease.ForeColor = Color.Cyan;
+                labelTime.Text = "-";
+                labelSz.Text = "-";
+                labelSzIncrease.Text = "-";
             }
 
 
             Stopwatch watch = new Stopwatch();
             watch.Start();
             double increase = 0;
-            foreach (var p in positions)
+            try
             {
-                url = "https://hq.sinajs.cn/list=" + p.exchange + p.code;
-                body = HttpHelper.GetHttp(url);
-
-                result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
-
-
-                open = Double.Parse(result[2]);
-                price = Double.Parse(result[3]);
-                labelTime.Text = result[31];
-                p.increase = (price - p.cost) / p.cost;
-
-                DateTime now = DateTime.Now;
-                //var tt = result[31].Split(':');
-                //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
-
-                increase += p.increase;
-                //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
-                //label1.Text = now.ToString("HH:mm:ss");
-            }
-            increase = increase / positions.Count * 100;
-            if (Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
-            {
-                if (increase < 0)
+                foreach (var p in positions)
                 {
-                    speake("负"+string.Format("{0:F2}", -increase), -5);
+                    url = "https://hq.sinajs.cn/list=" + p.exchange + p.code;
+                    body = HttpHelper.GetHttp(url);
+
+                    var result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
+
+
+                    double open = Double.Parse(result[2]);
+                    double price = Double.Parse(result[3]);
+                    labelTime.Text = result[31];
+                    p.increase = (price - p.cost) / p.cost;
+
+                    DateTime now = DateTime.Now;
+                    //var tt = result[31].Split(':');
+                    //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
+
+                    increase += p.increase;
+                    //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
+                    //label1.Text = now.ToString("HH:mm:ss");
+                }
+                increase = increase / positions.Count * 100;
+                if (Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
+                {
+                    if (increase < 0)
+                    {
+                        speake("负" + string.Format("{0:F2}", -increase), -5);
+                    }
+                    else
+                    {
+                        speake(string.Format("{0:F2}", increase));
+                    }
+                    preIncrease = increase;
+                }
+                watch.Stop();
+
+
+                //label1.Text = watch.ElapsedMilliseconds+"";
+                labelFunIncrease.Text = string.Format("{0:F2}", increase);
+                if (increase > 0)
+                {
+                    labelFunIncrease.ForeColor = Color.Red;
+                }
+                else if (increase == 0)
+                {
+                    labelFunIncrease.ForeColor = Color.White;
                 }
                 else
                 {
-                    speake(string.Format("{0:F2}", increase));
+                    labelFunIncrease.ForeColor = Color.Cyan;
                 }
-                preIncrease = increase;
             }
-            watch.Stop();
-
-
-            //label1.Text = watch.ElapsedMilliseconds+"";
-            labelFunIncrease.Text = string.Format("{0:F2}", increase);
-            if (increase > 0)
+            catch (Exception)
             {
-                labelFunIncrease.ForeColor = Color.Red;
-            }
-            else if (increase == 0)
-            {
-                labelFunIncrease.ForeColor = Color.White;
-            }
-            else
-            {
-                labelFunIncrease.ForeColor = Color.Cyan;
+                labelFunIncrease.Text = "-";
             }
         }
 
