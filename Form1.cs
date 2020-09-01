@@ -12,16 +12,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using System.Xml;
 
 namespace FundMonitor
 {
     public partial class Form1 : Form
     {
+        private delegate void FormControlInvoker();
         private List<Position> positions = new List<Position>();
-        private double preIncrease = 0, preMinIncrease = 10000;
-
-
+        private double preIncrease = 0,sustainedIncrease;
         private void setValue(string key, Object value)
         {
             XmlDocument xmlDoc = new XmlDocument();
@@ -32,7 +32,6 @@ namespace FundMonitor
             root.SetAttribute(key, value.ToString());
             xmlDoc.Save("data.xml");
         }
-
         private string getValue(string key)
         {
             XmlDocument xmlDoc = new XmlDocument();
@@ -75,138 +74,162 @@ namespace FundMonitor
                 this.Top = Convert.ToInt32(top);
             }
         }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             timer1.Start();
         }
-
         private void timer1_Tick(object sender, EventArgs e)
         {
 
-            string url = "https://hq.sinajs.cn/list=sh000001";
-            string body = HttpHelper.GetHttp(url);
-
-            try
+            new Thread(new ThreadStart(() =>
             {
-                string[] result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
+                string url = "https://hq.sinajs.cn/list=sh000001";
+                string body = HttpHelper.GetHttp(url);
 
-
-                double open = Double.Parse(result[2]);
-                double price = Double.Parse(result[3]);
-                //double increase = (price - open) / open;
-                labelTime.Text = result[31];
-                labelSz.Text = string.Format("{0:N2}", open);
-                labelSzIncrease.Text = string.Format("{0:N2}", (price - open) / open * 100);
-
-                if (price > open)
+                try
                 {
-                    labelSz.ForeColor = Color.Red;
-                    labelSzIncrease.ForeColor = Color.Red;
-                }
-                else if (price == open)
-                {
-                    labelSz.ForeColor = Color.White;
-                    labelSzIncrease.ForeColor = Color.White;
-                }
-                else
-                {
-                    labelSz.ForeColor = Color.Cyan;
-                    labelSzIncrease.ForeColor = Color.Cyan;
-                }
-            }
-            catch (Exception)
-            {
-                labelTime.Text = "-";
-                labelSz.Text = "-";
-                labelSzIncrease.Text = "-";
-            }
 
-
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            double increase = 0;
-            DateTime now = DateTime.Now;
-            try
-            {
-                foreach (var p in positions)
-                {
-                    url = "https://hq.sinajs.cn/list=" + p.exchange + p.code;
-                    body = HttpHelper.GetHttp(url);
-
-                    var result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
-
+                    string[] result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
 
                     double open = Double.Parse(result[2]);
                     double price = Double.Parse(result[3]);
-                    labelTime.Text = result[31];
-                    p.increase = (price - p.cost) / p.cost;
+                    //double increase = (price - open) / open;
 
-                    //var tt = result[31].Split(':');
-                    //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
+                        //labelTime.Text = result[31];
+                        labelSz.Text = string.Format("{0:N2}", open);
+                        labelSzIncrease.Text = string.Format("{0:N2}", (price - open) / open * 100);
 
-                    increase += p.increase;
-                    //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
-                    //label1.Text = now.ToString("HH:mm:ss");
-                }
-                increase = increase / positions.Count * 100;
-                if (Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
-                {
-                    if (increase < 0)
-                    {
-                        speake("负" + string.Format("{0:F2}", -increase), -5);
-                    }
-                    else
-                    {
-                        speake(string.Format("{0:F2}", increase));
-                    }
-                    preIncrease = increase;
-                }
-                watch.Stop();
-
-
-                //label1.Text = watch.ElapsedMilliseconds+"";
-                labelFunIncrease.Text = string.Format("{0:F2}", increase);
-                if (increase > 0)
-                {
-                    labelFunIncrease.ForeColor = Color.Red;
-                }
-                else if (increase == 0)
-                {
-                    labelFunIncrease.ForeColor = Color.White;
-                }
-                else
-                {
-                    labelFunIncrease.ForeColor = Color.Cyan;
-                }
-
-                if (now.Second == 0)
-                {
-                    if (preMinIncrease != 10000)
-                    {
-                        label1.Text = string.Format("{0:F2}", increase - preMinIncrease);
-                        if (increase > preMinIncrease)
+                        if (price > open)
                         {
-                            label1.ForeColor = Color.Red;
+                            labelSz.ForeColor = Color.Red;
+                            labelSzIncrease.ForeColor = Color.Red;
                         }
-                        else if (increase == preMinIncrease)
+                        else if (price == open)
                         {
-                            label1.ForeColor = Color.White;
+                            labelSz.ForeColor = Color.White;
+                            labelSzIncrease.ForeColor = Color.White;
                         }
                         else
                         {
-                            label1.ForeColor = Color.Cyan;
+                            labelSz.ForeColor = Color.Cyan;
+                            labelSzIncrease.ForeColor = Color.Cyan;
                         }
-                    }
-                    preMinIncrease = increase;
                 }
-            }
-            catch (Exception)
-            {
-                labelFunIncrease.Text = "-";
-            }
-        }
+                catch (Exception)
+                {
+                    labelTime.Text = "-";
+                    labelSz.Text = "-";
+                    labelSzIncrease.Text = "-";
+                }
 
+
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                double increase = 0;
+                DateTime now = DateTime.Now;
+                string time = "";
+                try
+                {
+                    foreach (var p in positions)
+                    {
+                        url = "https://hq.sinajs.cn/list=" + p.exchange + p.code;
+                        body = HttpHelper.GetHttp(url);
+
+                        var result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
+
+
+                        double open = Double.Parse(result[2]);
+                        double price = Double.Parse(result[3]);
+                        time = result[31];
+                        p.increase = (price - p.cost) / p.cost;
+
+                        //var tt = result[31].Split(':');
+                        //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
+
+                        increase += p.increase;
+                        //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
+                        //label1.Text = now.ToString("HH:mm:ss");
+                    }
+                    labelTime.Text = time;
+                    increase = increase / positions.Count * 100;
+
+
+                    double span = increase - preIncrease;
+                    if (sustainedIncrease * span >= 0)
+                    {
+                        // 符号相同
+                        sustainedIncrease += span;
+                    }
+                    else
+                    {
+                        // 符号相反
+                        sustainedIncrease = span;
+                    }
+                    if (sustainedIncrease > 0)
+                    {
+                        label1.ForeColor = Color.Red;
+                    }
+                    else if (sustainedIncrease == 0)
+                    {
+                        label1.ForeColor = Color.White;
+                    }
+                    else
+                    {
+                        label1.ForeColor = Color.Cyan;
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+                    if (Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
+                    {
+                        if (increase < 0)
+                        {
+                            speake("负" + string.Format("{0:F2}", -increase), -5);
+                        }
+                        else
+                        {
+                            speake(string.Format("{0:F2}", increase));
+                        }
+
+
+                        preIncrease = increase;
+                    }
+                    watch.Stop();
+
+
+                    //label1.Text = watch.ElapsedMilliseconds+"";
+                    labelFunIncrease.Text = string.Format("{0:F2}", increase);
+                    if (increase > 0)
+                    {
+                        labelFunIncrease.ForeColor = Color.Red;
+                    }
+                    else if (increase == 0)
+                    {
+                        labelFunIncrease.ForeColor = Color.White;
+                    }
+                    else
+                    {
+                        labelFunIncrease.ForeColor = Color.Cyan;
+                    }
+
+                }
+                catch (Exception)
+                {
+                    labelFunIncrease.Text = "-";
+                }
+
+            })).Start();
+
+        }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             this.timer1.Stop();
@@ -214,7 +237,6 @@ namespace FundMonitor
             this.setValue("left", this.Left);
             this.setValue("top", this.Top);
         }
-
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
             if (this.move)
@@ -225,7 +247,6 @@ namespace FundMonitor
             this.MouseX = System.Windows.Forms.Control.MousePosition.X;
             this.MouseY = System.Windows.Forms.Control.MousePosition.Y;
         }
-
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
             this.Cursor = Cursors.Default;
@@ -234,16 +255,6 @@ namespace FundMonitor
 
         private bool move = false;
         private int MouseX, MouseY;
-
-
-        private void labelFunIncrease_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
-            {
-                this.Cursor = Cursors.SizeAll;
-                this.move = true;
-            }
-        }
 
         private void labelFunIncrease_MouseMove(object sender, MouseEventArgs e)
         {
@@ -255,11 +266,30 @@ namespace FundMonitor
             this.MouseX = System.Windows.Forms.Control.MousePosition.X;
             this.MouseY = System.Windows.Forms.Control.MousePosition.Y;
         }
-
         private void labelFunIncrease_MouseUp(object sender, MouseEventArgs e)
         {
             this.Cursor = Cursors.Default;
             this.move = false;
+        }
+
+        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        {
+                this.Show();
+        }
+
+        private void labelFunIncrease_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                this.Cursor = Cursors.SizeAll;
+                this.move = true;
+            }
+        }
+
+
+        private void labelTime_Click(object sender, EventArgs e)
+        {
+            this.Hide();
         }
 
         private void labelFunIncrease_MouseClick(object sender, MouseEventArgs e)
@@ -267,15 +297,6 @@ namespace FundMonitor
             if (e.Button == MouseButtons.Right)
             {
                 this.Close();
-            }
-        }
-
-        private void Form1_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
-            {
-                this.Cursor = Cursors.SizeAll;
-                this.move = true;
             }
         }
 
@@ -301,7 +322,6 @@ namespace FundMonitor
         public double cost;
         public int amount;
         public string exchange;
-
 
         public double increase;
 

@@ -14,6 +14,7 @@ namespace FundMonitor
         [STAThread]
         static void Main()
         {
+            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
