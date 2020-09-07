@@ -1,4 +1,5 @@
 ﻿using FundMonitor.helper;
+using LitJson;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
 using System.Text;
@@ -19,9 +21,11 @@ namespace FundMonitor
 {
     public partial class Form1 : Form
     {
+        private bool isSpeake = false;
         private delegate void FormControlInvoker();
         private List<Position> positions = new List<Position>();
-        private double preIncrease = 0,sustainedIncrease;
+        private double preIncrease = 0, preIncrease1 = 0, sustainedIncrease, sustainedCount;
+        string preTime = "";
         private void setValue(string key, Object value)
         {
             XmlDocument xmlDoc = new XmlDocument();
@@ -48,19 +52,22 @@ namespace FundMonitor
         {
             InitializeComponent();
 
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load("data.xml");
-            //XmlNodeList nodeList = xmlDoc.SelectSingleNode("positions").ChildNodes;
-            XmlNodeList nodeList = xmlDoc.SelectNodes("//position");
-            foreach (XmlNode xn in nodeList)
-            {
-                XmlElement xe = (XmlElement)xn;
-                string code = xe.GetAttribute("code");
-                string name = xe.GetAttribute("name");
-                string cost = xe.GetAttribute("cost");
-                string amount = xe.GetAttribute("amount");
-                positions.Add(new Position(code, name, Double.Parse(cost), int.Parse(amount)));
-            }
+
+
+            //XmlDocument xmlDoc = new XmlDocument();
+            //xmlDoc.Load("data.xml");
+
+            //XmlNodeList nodeList = xmlDoc.SelectNodes("//position");
+            //foreach (XmlNode xn in nodeList)
+            //{
+            //    XmlElement xe = (XmlElement)xn;
+            //    string code = xe.GetAttribute("code");
+            //    string name = xe.GetAttribute("name");
+            //    string cost = xe.GetAttribute("cost");
+            //    string amount = xe.GetAttribute("amount");
+            //    positions.Add(new Position(code, name, Double.Parse(cost), int.Parse(amount)));
+            //}
+
 
 
             var left = this.getValue("left");
@@ -73,6 +80,63 @@ namespace FundMonitor
             {
                 this.Top = Convert.ToInt32(top);
             }
+            var speake = this.getValue("speake");
+            if (speake != null)
+            {
+                this.isSpeake = Convert.ToBoolean(speake);
+                if (isSpeake)
+                {
+                    this.labelTime.ForeColor = System.Drawing.Color.White;
+                }
+                else
+                {
+                    this.labelTime.ForeColor = System.Drawing.Color.Silver;
+                }
+            }
+
+            var pwd = this.getValue("pwd");
+            if (pwd != null)
+            {
+                positions = getPositions(pwd);
+            }
+            else
+            {
+                MessageBox.Show("配置pwd");
+            }
+        }
+
+        private List<Position> getPositions(string pwd)
+        {
+            List<Position> result = new List<Position>();
+            string html = HttpHelper.GetHttp("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxbdf065bdeba96196&secret=d2834f10c0d81728e73a4fe4012c0a5d");
+            JsonData jsonData = JsonMapper.ToObject(html);
+            string access_token = jsonData["access_token"].ToString();
+
+
+            string url = "https://api.weixin.qq.com/tcb/invokecloudfunction?access_token=" + access_token + "&env=yipinshangdu-4wk7z&name=getPositions";
+            string body = "{\"pwd\":\"" + pwd + "\"}";
+            html = HttpHelper.PostHttpByJson(url, body);
+            jsonData = JsonMapper.ToObject(html);
+            if (jsonData["errcode"].ToString().Equals("0"))
+            {
+                string resp_data = jsonData["resp_data"].ToString();
+                jsonData = JsonMapper.ToObject(resp_data);
+                JsonData list = jsonData["data"];
+
+                foreach (JsonData position in list)
+                {
+                    string name = position["name"].ToString();
+                    string code = position["code"].ToString();
+                    int amount = Convert.ToInt32(position["amount"].ToString());
+                    double cost = Convert.ToDouble(position["cost"].ToString());
+                    if (amount > 0)
+                        result.Add(new Position(code, name, cost, amount));
+                }
+            }
+
+
+            return result;
+
         }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -95,25 +159,25 @@ namespace FundMonitor
                     double price = Double.Parse(result[3]);
                     //double increase = (price - open) / open;
 
-                        //labelTime.Text = result[31];
-                        labelSz.Text = string.Format("{0:N2}", open);
-                        labelSzIncrease.Text = string.Format("{0:N2}", (price - open) / open * 100);
+                    //labelTime.Text = result[31];
+                    labelSz.Text = string.Format("{0:N2}", price);
+                    labelSzIncrease.Text = string.Format("{0:N2}", (price - open) / open * 100);
 
-                        if (price > open)
-                        {
-                            labelSz.ForeColor = Color.Red;
-                            labelSzIncrease.ForeColor = Color.Red;
-                        }
-                        else if (price == open)
-                        {
-                            labelSz.ForeColor = Color.White;
-                            labelSzIncrease.ForeColor = Color.White;
-                        }
-                        else
-                        {
-                            labelSz.ForeColor = Color.Cyan;
-                            labelSzIncrease.ForeColor = Color.Cyan;
-                        }
+                    if (price > open)
+                    {
+                        labelSz.ForeColor = Color.Red;
+                        labelSzIncrease.ForeColor = Color.Red;
+                    }
+                    else if (price == open)
+                    {
+                        labelSz.ForeColor = Color.White;
+                        labelSzIncrease.ForeColor = Color.White;
+                    }
+                    else
+                    {
+                        labelSz.ForeColor = Color.Cyan;
+                        labelSzIncrease.ForeColor = Color.Cyan;
+                    }
                 }
                 catch (Exception)
                 {
@@ -130,6 +194,7 @@ namespace FundMonitor
                 string time = "";
                 try
                 {
+                    string str = "";
                     foreach (var p in positions)
                     {
                         url = "https://hq.sinajs.cn/list=" + p.exchange + p.code;
@@ -142,6 +207,8 @@ namespace FundMonitor
                         double price = Double.Parse(result[3]);
                         time = result[31];
                         p.increase = (price - p.cost) / p.cost;
+                        str += $"{p.name}\t{price}\t";
+
 
                         //var tt = result[31].Split(':');
                         //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
@@ -150,21 +217,42 @@ namespace FundMonitor
                         //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
                         //label1.Text = now.ToString("HH:mm:ss");
                     }
+
+                    if (!preTime.Equals(time))
+                    {
+                        var write = File.AppendText("stock.txt");
+                        str = $"{time}\t" + str;
+                        write.WriteLine(str);
+                        write.Close();
+                        preTime = time;
+                    }
+
                     labelTime.Text = time;
                     increase = increase / positions.Count * 100;
 
 
-                    double span = increase - preIncrease;
+                    double span = increase - preIncrease1;
                     if (sustainedIncrease * span >= 0)
                     {
                         // 符号相同
                         sustainedIncrease += span;
+                        if (span != 0)
+                        {
+                            sustainedCount++;
+                        }
                     }
                     else
                     {
                         // 符号相反
                         sustainedIncrease = span;
+                        sustainedCount = 1;
                     }
+                    if (sustainedIncrease == increase)
+                    {
+                        sustainedIncrease = 0;
+                        sustainedCount = 0;
+                    }
+                    label1.Text = string.Format("{0:F2}", sustainedIncrease) + " (" + sustainedCount + ")";
                     if (sustainedIncrease > 0)
                     {
                         label1.ForeColor = Color.Red;
@@ -177,19 +265,11 @@ namespace FundMonitor
                     {
                         label1.ForeColor = Color.Cyan;
                     }
+                    preIncrease1 = increase;
 
 
 
-
-
-
-
-
-
-
-
-
-                    if (Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
+                    if (isSpeake && Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
                     {
                         if (increase < 0)
                         {
@@ -199,8 +279,6 @@ namespace FundMonitor
                         {
                             speake(string.Format("{0:F2}", increase));
                         }
-
-
                         preIncrease = increase;
                     }
                     watch.Stop();
@@ -221,12 +299,12 @@ namespace FundMonitor
                         labelFunIncrease.ForeColor = Color.Cyan;
                     }
 
+                    notifyIcon1.Text = string.Format("{0:F2}", increase);
                 }
                 catch (Exception)
                 {
                     labelFunIncrease.Text = "-";
                 }
-
             })).Start();
 
         }
@@ -274,7 +352,7 @@ namespace FundMonitor
 
         private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
         {
-                this.Show();
+            this.Show();
         }
 
         private void labelFunIncrease_MouseDown(object sender, MouseEventArgs e)
@@ -286,10 +364,27 @@ namespace FundMonitor
             }
         }
 
-
-        private void labelTime_Click(object sender, EventArgs e)
+        private void labelTime_MouseClick(object sender, MouseEventArgs e)
         {
-            this.Hide();
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                if (isSpeake)
+                {
+                    isSpeake = false;
+                    this.labelTime.ForeColor = System.Drawing.Color.Silver;
+                }
+                else
+                {
+                    isSpeake = true;
+                    this.labelTime.ForeColor = System.Drawing.Color.White;
+                }
+                this.setValue("speake", isSpeake);
+            }
+            else
+            {
+                this.Hide();
+            }
+
         }
 
         private void labelFunIncrease_MouseClick(object sender, MouseEventArgs e)
