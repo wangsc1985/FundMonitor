@@ -37,6 +37,8 @@
             this.labelTime = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.pictureBoxVolume = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxVolume)).BeginInit();
             this.SuspendLayout();
             // 
             // labelSz
@@ -120,12 +122,25 @@
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
             // 
+            // pictureBoxVolume
+            // 
+            this.pictureBoxVolume.Image = global::FundMonitor.Properties.Resources.volume_on;
+            this.pictureBoxVolume.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBoxVolume.InitialImage")));
+            this.pictureBoxVolume.Location = new System.Drawing.Point(13, 9);
+            this.pictureBoxVolume.Name = "pictureBoxVolume";
+            this.pictureBoxVolume.Size = new System.Drawing.Size(17, 17);
+            this.pictureBoxVolume.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxVolume.TabIndex = 2;
+            this.pictureBoxVolume.TabStop = false;
+            this.pictureBoxVolume.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBoxVolume_MouseClick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(29)))), ((int)(((byte)(29)))), ((int)(((byte)(29)))));
             this.ClientSize = new System.Drawing.Size(226, 117);
+            this.Controls.Add(this.pictureBoxVolume);
             this.Controls.Add(this.labelTime);
             this.Controls.Add(this.labelFunIncrease);
             this.Controls.Add(this.labelSzIncrease);
@@ -140,6 +155,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxVolume)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -153,6 +169,7 @@
         private System.Windows.Forms.Label labelTime;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.PictureBox pictureBoxVolume;
     }
 }
 

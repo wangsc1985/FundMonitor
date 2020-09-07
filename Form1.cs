@@ -86,11 +86,13 @@ namespace FundMonitor
                 this.isSpeake = Convert.ToBoolean(speake);
                 if (isSpeake)
                 {
-                    this.labelTime.ForeColor = System.Drawing.Color.White;
+                    this.pictureBoxVolume.Image = global::FundMonitor.Properties.Resources.volume_on;
+                    //this.labelTime.ForeColor = System.Drawing.Color.White;
                 }
                 else
                 {
-                    this.labelTime.ForeColor = System.Drawing.Color.Silver;
+                    this.pictureBoxVolume.Image = global::FundMonitor.Properties.Resources.volume_off;
+                    //this.labelTime.ForeColor = System.Drawing.Color.Silver;
                 }
             }
 
@@ -364,27 +366,25 @@ namespace FundMonitor
             }
         }
 
-        private void labelTime_MouseClick(object sender, MouseEventArgs e)
+        private void pictureBoxVolume_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            isSpeake = !isSpeake;
+            if (isSpeake)
             {
-                if (isSpeake)
-                {
-                    isSpeake = false;
-                    this.labelTime.ForeColor = System.Drawing.Color.Silver;
-                }
-                else
-                {
-                    isSpeake = true;
-                    this.labelTime.ForeColor = System.Drawing.Color.White;
-                }
-                this.setValue("speake", isSpeake);
+                this.pictureBoxVolume.Image = global::FundMonitor.Properties.Resources.volume_on;
+                //this.labelTime.ForeColor = System.Drawing.Color.Silver;
             }
             else
             {
-                this.Hide();
+                this.pictureBoxVolume.Image = global::FundMonitor.Properties.Resources.volume_off;
+                //this.labelTime.ForeColor = System.Drawing.Color.White;
             }
+            this.setValue("speake", isSpeake);
+        }
 
+        private void labelTime_MouseClick(object sender, MouseEventArgs e)
+        {
+            this.Hide();
         }
 
         private void labelFunIncrease_MouseClick(object sender, MouseEventArgs e)
