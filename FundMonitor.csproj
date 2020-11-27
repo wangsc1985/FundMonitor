@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>stock.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="LitJSON, Version=0.16.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\LitJson.0.16.0\lib\net45\LitJSON.dll</HintPath>
@@ -97,6 +100,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\volume_on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="stock.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

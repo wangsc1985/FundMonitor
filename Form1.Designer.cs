@@ -71,7 +71,7 @@
             this.labelFunIncrease.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labelFunIncrease.BackColor = System.Drawing.Color.Transparent;
-            this.labelFunIncrease.Font = new System.Drawing.Font("方正粗黑宋简体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelFunIncrease.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelFunIncrease.ForeColor = System.Drawing.Color.White;
             this.labelFunIncrease.Location = new System.Drawing.Point(12, 37);
             this.labelFunIncrease.Name = "labelFunIncrease";

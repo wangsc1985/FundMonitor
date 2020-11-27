@@ -144,11 +144,16 @@ namespace FundMonitor
         {
             timer1.Start();
         }
+
+        private bool isFinished = true;
         private void timer1_Tick(object sender, EventArgs e)
         {
 
             new Thread(new ThreadStart(() =>
             {
+                if (isFinished == false)
+                    return;
+                isFinished = false;
                 string url = "https://hq.sinajs.cn/list=sh000001";
                 string body = HttpHelper.GetHttp(url);
 
@@ -186,6 +191,7 @@ namespace FundMonitor
                     labelTime.Text = "-";
                     labelSz.Text = "-";
                     labelSzIncrease.Text = "-";
+                    isFinished = true;
                 }
 
 
@@ -306,7 +312,10 @@ namespace FundMonitor
                 catch (Exception)
                 {
                     labelFunIncrease.Text = "-";
+                    isFinished = true;
                 }
+
+                isFinished = true;
             })).Start();
 
         }
