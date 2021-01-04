@@ -21,6 +21,12 @@ namespace FundMonitor
 {
     public partial class Form1 : Form
     {
+
+        private string env = "yipinshangdu-4wk7z";
+        private string appid = "wxbdf065bdeba96196";
+        private string secret = "d2834f10c0d81728e73a4fe4012c0a5d";
+
+
         private bool isSpeake = false;
         private delegate void FormControlInvoker();
         private List<Position> positions = new List<Position>();
@@ -110,15 +116,17 @@ namespace FundMonitor
         private List<Position> getPositions(string pwd)
         {
             List<Position> result = new List<Position>();
-            string html = HttpHelper.GetHttp("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxbdf065bdeba96196&secret=d2834f10c0d81728e73a4fe4012c0a5d");
-            JsonData jsonData = JsonMapper.ToObject(html);
-            string access_token = jsonData["access_token"].ToString();
+            
+            string html = HttpHelper.GetHttp($"https://sahacloudmanager.azurewebsites.net/home/token/{appid}/{secret}");
+
+            var data = html.Split(':');
+            string access_token = data[0];
 
 
-            string url = "https://api.weixin.qq.com/tcb/invokecloudfunction?access_token=" + access_token + "&env=yipinshangdu-4wk7z&name=getPositions";
+            string url = $"https://api.weixin.qq.com/tcb/invokecloudfunction?access_token={access_token}&env={env}&name=getPositions";
             string body = "{\"pwd\":\"" + pwd + "\"}";
             html = HttpHelper.PostHttpByJson(url, body);
-            jsonData = JsonMapper.ToObject(html);
+            JsonData jsonData = JsonMapper.ToObject(html);
             if (jsonData["errcode"].ToString().Equals("0"))
             {
                 string resp_data = jsonData["resp_data"].ToString();
