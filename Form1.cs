@@ -10,11 +10,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Threading;
 using System.Xml;
 
 namespace FundMonitor
@@ -29,7 +26,7 @@ namespace FundMonitor
 
         private bool isSpeake = false;
         private delegate void FormControlInvoker();
-        private List<Position> positions = new List<Position>();
+        private List<Position> positionList = new List<Position>();
         private double preIncrease = 0, preIncrease1 = 0, sustainedIncrease, sustainedCount;
         string preTime = "";
         private void setValue(string key, Object value)
@@ -105,7 +102,7 @@ namespace FundMonitor
             var pwd = this.getValue("pwd");
             if (pwd != null)
             {
-                positions = getPositions(pwd);
+                positionList = getPositions(pwd);
             }
             else
             {
@@ -211,9 +208,9 @@ namespace FundMonitor
                 try
                 {
                     string str = "";
-                    foreach (var p in positions)
+                    foreach (var position in positionList)
                     {
-                        url = "https://hq.sinajs.cn/list=" + p.exchange + p.code;
+                        url = "https://hq.sinajs.cn/list=" + position.exchange + position.code;
                         body = HttpHelper.GetHttp(url);
 
                         var result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
@@ -222,14 +219,17 @@ namespace FundMonitor
                         double open = Double.Parse(result[2]);
                         double price = Double.Parse(result[3]);
                         time = result[31];
-                        p.increase = (price - p.cost) / p.cost;
-                        str += $"{p.name}\t{price}\t";
+
+
+                        var fee =TradeUtils.commission(price, position.amount) + TradeUtils.tax(-1, price, position.amount) + TradeUtils.transferFee(price, position.amount);
+                        position.increase = ((price - position.cost) * position.amount * 100 - fee) / (position.cost * position.amount * 100);
+                        str += $"{position.name}\t{price}\t";
 
 
                         //var tt = result[31].Split(':');
                         //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
 
-                        increase += p.increase;
+                        increase += position.increase;
                         //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
                         //label1.Text = now.ToString("HH:mm:ss");
                     }
@@ -244,7 +244,7 @@ namespace FundMonitor
                     }
 
                     labelTime.Text = time;
-                    increase = increase / positions.Count * 100;
+                    increase = increase / positionList.Count * 100;
 
 
                     double span = increase - preIncrease1;
@@ -285,7 +285,7 @@ namespace FundMonitor
 
 
 
-                    if (isSpeake && Math.Abs(increase - preIncrease) > (1.0 / positions.Count))
+                    if (isSpeake && Math.Abs(increase - preIncrease) > (1.0 / positionList.Count))
                     {
                         if (increase < 0)
                         {

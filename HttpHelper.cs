@@ -1,5 +1,4 @@
-﻿using CensusManager.helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,6 +11,7 @@ namespace FundMonitor.helper
 {
     class HttpHelper
     {
+        public static CookieContainer cookie = new CookieContainer();
         //body是要传递的参数,格式"roleId=1&uid=2"
         //post的cotentType填写:
         //"application/x-www-form-urlencoded;text/xml; charset=utf-8"
@@ -20,7 +20,7 @@ namespace FundMonitor.helper
             HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
 
             httpWebRequest.ContentType = "application/x-www-form-urlencoded;text/xml;charset=utf-8";
-            httpWebRequest.CookieContainer = _Session.cookie;
+            httpWebRequest.CookieContainer = cookie;
             httpWebRequest.Method = "POST";
             httpWebRequest.Timeout = 200000000;
 
@@ -53,7 +53,7 @@ namespace FundMonitor.helper
             try
             {
                 hwRequest = (HttpWebRequest)WebRequest.Create(url);
-                hwRequest.CookieContainer = _Session.cookie;
+                hwRequest.CookieContainer = cookie;
                 //hwRequest.Timeout = 30000;
                 hwRequest.Method = "GET";
                 hwRequest.ContentType = "application/x-www-form-urlencoded;charset=UTF-8";
@@ -72,7 +72,7 @@ namespace FundMonitor.helper
         public static string PostHttpByJson( string uri, string json)
         {
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(uri);
-            httpWebRequest.CookieContainer = _Session.cookie;
+            httpWebRequest.CookieContainer = cookie;
             httpWebRequest.ContentType = "application/json;charset=UTF-8";
             httpWebRequest.Method = "POST";
 
