@@ -13,11 +13,11 @@ namespace FundMonitor
          * type price amount
          * @param money
          */
-        public static double tax(int type, double price, int amount)
+        public static decimal tax(int type, decimal price, int amount)
         {
             if (type == 1)
             {
-                return 0.0;
+                return 0.0m;
             }
             else
             {
@@ -30,11 +30,11 @@ namespace FundMonitor
          * 佣金  万3  最低5元
          * price amount
          */
-        public static double commission(double price, int amount)
+        public static decimal commission(decimal price, int amount)
         {
             var money = price * amount * 100;
             money = money * 3 / 10000;
-            if (money < 5) return 5.0; else return money;
+            if (money < 5) return 5.0m; else return money;
         }
 
 
@@ -42,7 +42,7 @@ namespace FundMonitor
          * 过户费   十万2
          * price amount
          */
-        public static double transferFee(double price, int amount)
+        public static decimal transferFee(decimal price, int amount)
         {
             var money = price * amount * 100;
             return money * 2 / 100000;

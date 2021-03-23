@@ -27,7 +27,7 @@ namespace FundMonitor
         private bool isSpeake = false;
         private delegate void FormControlInvoker();
         private List<Position> positionList = new List<Position>();
-        private double preIncrease = 0, preIncrease1 = 0, sustainedIncrease, sustainedCount;
+        private decimal preIncrease = 0m, preIncrease1 = 0m, sustainedIncrease, sustainedCount;
         string preTime = "";
         private void setValue(string key, Object value)
         {
@@ -135,9 +135,10 @@ namespace FundMonitor
                     string name = position["name"].ToString();
                     string code = position["code"].ToString();
                     int amount = Convert.ToInt32(position["amount"].ToString());
-                    double cost = Convert.ToDouble(position["cost"].ToString());
+                    decimal cost = Convert.ToDecimal(position["cost"].ToString());
+                    string exchange = position["exchange"].ToString();
                     if (amount > 0)
-                        result.Add(new Position(code, name, cost, amount));
+                        result.Add(new Position(code, name, cost, amount,exchange));
                 }
             }
 
@@ -202,7 +203,7 @@ namespace FundMonitor
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                double increase = 0;
+                decimal totalProfit=0,totalFund=0;
                 DateTime now = DateTime.Now;
                 string time = "";
                 try
@@ -216,20 +217,23 @@ namespace FundMonitor
                         var result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
 
 
-                        double open = Double.Parse(result[2]);
-                        double price = Double.Parse(result[3]);
+                        decimal open = Decimal.Parse(result[2]);
+                        decimal price = Decimal.Parse(result[3]);
                         time = result[31];
 
 
                         var fee =TradeUtils.commission(price, position.amount) + TradeUtils.tax(-1, price, position.amount) + TradeUtils.transferFee(price, position.amount);
-                        position.increase = ((price - position.cost) * position.amount * 100 - fee) / (position.cost * position.amount * 100);
+                        //position.increase = ((price - position.cost) * position.amount * 100 - fee) / (position.cost * position.amount * 100);
                         str += $"{position.name}\t{price}\t";
 
+                        totalProfit += (price - position.cost) * position.amount * 100 - fee;
+                        totalFund += position.cost * position.amount * 100;
 
                         //var tt = result[31].Split(':');
                         //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
 
-                        increase += position.increase;
+                        //increase += position.increase;
+                        
                         //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
                         //label1.Text = now.ToString("HH:mm:ss");
                     }
@@ -244,10 +248,10 @@ namespace FundMonitor
                     }
 
                     labelTime.Text = time;
-                    increase = increase / positionList.Count * 100;
+                    var increase = totalProfit*100 / totalFund;
 
 
-                    double span = increase - preIncrease1;
+                    decimal span = increase - preIncrease1;
                     if (sustainedIncrease * span >= 0)
                     {
                         // 符号相同
@@ -285,7 +289,7 @@ namespace FundMonitor
 
 
 
-                    if (isSpeake && Math.Abs(increase - preIncrease) > (1.0 / positionList.Count))
+                    if (isSpeake && Math.Abs(increase - preIncrease) > (1.0m / positionList.Count))
                     {
                         if (increase < 0)
                         {
@@ -431,19 +435,19 @@ namespace FundMonitor
     {
         public string code;
         public string name;
-        public double cost;
+        public decimal cost;
         public int amount;
         public string exchange;
 
-        public double increase;
+        public decimal increase;
 
-        public Position(string code, string name, double cost, int amount)
+        public Position(string code, string name, decimal cost, int amount,string exchange)
         {
             this.code = code;
             this.name = name;
             this.cost = cost;
             this.amount = amount;
-            exchange = code.Substring(0, 1).Equals("6") ? "sh" : "sz";
+            this.exchange = exchange;
         }
     }
 }
