@@ -203,7 +203,7 @@ namespace FundMonitor
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                decimal totalProfit=0,totalFund=0;
+                decimal totalProfit = 0, totalFund = 0, totalDiff = 0;
                 DateTime now = DateTime.Now;
                 string time = "";
                 try
@@ -217,8 +217,12 @@ namespace FundMonitor
                         var result = body.Substring(body.IndexOf("\"")).Replace("\"", "").Split(',');
 
 
-                        decimal open = Decimal.Parse(result[2]);
+                        decimal yesPrice = Decimal.Parse(result[2]);
                         decimal price = Decimal.Parse(result[3]);
+                        if (price == 0)
+                        {
+                            price = yesPrice;
+                        }
                         time = result[31];
 
 
@@ -228,12 +232,13 @@ namespace FundMonitor
 
                         totalProfit += (price - position.cost) * position.amount * 100 - fee;
                         totalFund += position.cost * position.amount * 100;
+                        totalDiff += (price - yesPrice) * position.amount * 100;
 
                         //var tt = result[31].Split(':');
                         //var tradeTime = new DateTime(now.Year, now.Month, now.Day, int.Parse(tt[0]), int.Parse(tt[1]), int.Parse(tt[2]));
 
                         //increase += position.increase;
-                        
+
                         //label1.Text = string.Format("{0:F0}", (now - tradeTime).TotalSeconds) + "";
                         //label1.Text = now.ToString("HH:mm:ss");
                     }
@@ -249,6 +254,7 @@ namespace FundMonitor
 
                     labelTime.Text = time;
                     var increase = totalProfit*100 / totalFund;
+                    var difInc = totalDiff * 100 / totalFund;
 
 
                     decimal span = increase - preIncrease1;
@@ -317,6 +323,19 @@ namespace FundMonitor
                     else
                     {
                         labelFunIncrease.ForeColor = Color.Cyan;
+                    }
+                    labelDiff.Text = string.Format("{0:F2}", difInc);
+                    if (difInc > 0)
+                    {
+                        labelDiff.ForeColor = Color.Red;
+                    }
+                    else if (difInc == 0)
+                    {
+                        labelDiff.ForeColor = Color.White;
+                    }
+                    else
+                    {
+                        labelDiff.ForeColor = Color.Cyan;
                     }
 
                     notifyIcon1.Text = string.Format("{0:F2}", increase);

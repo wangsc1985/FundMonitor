@@ -38,6 +38,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.pictureBoxVolume = new System.Windows.Forms.PictureBox();
+            this.labelDiff = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxVolume)).BeginInit();
             this.SuspendLayout();
             // 
@@ -95,12 +96,12 @@
             this.labelTime.BackColor = System.Drawing.Color.Transparent;
             this.labelTime.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelTime.ForeColor = System.Drawing.Color.White;
-            this.labelTime.Location = new System.Drawing.Point(134, 9);
+            this.labelTime.Location = new System.Drawing.Point(12, 9);
             this.labelTime.Name = "labelTime";
             this.labelTime.Size = new System.Drawing.Size(80, 17);
             this.labelTime.TabIndex = 1;
             this.labelTime.Text = "00:00:00";
-            this.labelTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.labelTime.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.labelTime.MouseClick += new System.Windows.Forms.MouseEventHandler(this.labelTime_MouseClick);
             // 
             // label1
@@ -124,9 +125,11 @@
             // 
             // pictureBoxVolume
             // 
+            this.pictureBoxVolume.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBoxVolume.Image = global::FundMonitor.Properties.Resources.volume_on;
             this.pictureBoxVolume.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBoxVolume.InitialImage")));
-            this.pictureBoxVolume.Location = new System.Drawing.Point(13, 9);
+            this.pictureBoxVolume.Location = new System.Drawing.Point(104, 9);
             this.pictureBoxVolume.Name = "pictureBoxVolume";
             this.pictureBoxVolume.Size = new System.Drawing.Size(17, 17);
             this.pictureBoxVolume.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -134,12 +137,25 @@
             this.pictureBoxVolume.TabStop = false;
             this.pictureBoxVolume.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBoxVolume_MouseClick);
             // 
+            // labelDiff
+            // 
+            this.labelDiff.BackColor = System.Drawing.Color.Transparent;
+            this.labelDiff.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelDiff.ForeColor = System.Drawing.Color.White;
+            this.labelDiff.Location = new System.Drawing.Point(134, 9);
+            this.labelDiff.Name = "labelDiff";
+            this.labelDiff.Size = new System.Drawing.Size(80, 17);
+            this.labelDiff.TabIndex = 3;
+            this.labelDiff.Text = "0";
+            this.labelDiff.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(29)))), ((int)(((byte)(29)))), ((int)(((byte)(29)))));
             this.ClientSize = new System.Drawing.Size(226, 117);
+            this.Controls.Add(this.labelDiff);
             this.Controls.Add(this.pictureBoxVolume);
             this.Controls.Add(this.labelTime);
             this.Controls.Add(this.labelFunIncrease);
@@ -170,6 +186,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.PictureBox pictureBoxVolume;
+        private System.Windows.Forms.Label labelDiff;
     }
 }
 
